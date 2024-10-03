@@ -4,6 +4,7 @@ dotenvflow.config();
 
 export default {
   ENV: process.env.ENV,
+  ORIGIN: process.env.ORIGIN,
   UNSPLASH_ACCESS_KEY: process.env.UNSPLASH_ACCESS_KEY,
   PORT: process.env.PORT,
   SERVER_URL: process.env.SERVER_URL,

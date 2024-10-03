@@ -6,7 +6,7 @@ const jobsFilePath = path.join(__dirname, '../../', 'public', 'jobs.json');
 
 export const readJobsFromFile = (): Job[] => {
   if (!fs.existsSync(jobsFilePath)) {
-    throw new Error('Failed to read!'); // we can add logger here
+    return []; // we can add logger here
   }
 
   try {

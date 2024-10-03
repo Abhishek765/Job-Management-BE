@@ -1,11 +1,19 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
+import cors from 'cors';
 import path from 'path';
 import httpError from './utils/httpError';
 import responseMessages from './constants/responseMessages';
 import jobRouter from './router/jobs';
 import globalErrorHandler from './middlewares/globalErrorHandler';
+import config from './config';
 
 const app: Application = express();
+
+app.use(
+  cors({
+    origin: config.ORIGIN
+  })
+);
 
 // middlewares
 app.use(express.json());

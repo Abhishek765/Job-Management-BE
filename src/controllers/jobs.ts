@@ -27,7 +27,7 @@ export const createJob = (req: Request, res: Response, next: NextFunction) => {
     // TODO: For scalability, and reliability  + High load concurrency handling we need to use message queue system like BullMQ + Redis combo
     const timeoutId = setTimeout(async () => {
       try {
-        const imageUrls = await fetchRandomPhotos({ count: 5, query: 'food' });
+        const imageUrls = await fetchRandomPhotos({ count: 1, query: 'food' });
         // Update the job once it's resolved
         updateJobInFile(jobId, {
           status: 'resolved',
@@ -54,8 +54,26 @@ export const createJob = (req: Request, res: Response, next: NextFunction) => {
 export const getJobs = (req: Request, res: Response, next: NextFunction) => {
   try {
     const jobs = readJobsFromFile();
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const paginatedJobs = jobs.slice(startIndex, endIndex);
+
+    // pagination metadata
+    const pagination = {
+      totalJobs: jobs.length,
+      currentPage: page,
+      totalPages: Math.ceil(jobs.length / limit),
+      limit: limit
+    };
+
     httpResponse(req, res, 200, responseMessages.SUCCESS, {
-      jobs
+      jobs: paginatedJobs,
+      pagination
     });
   } catch (error) {
     httpError(next, error, req, 404);
