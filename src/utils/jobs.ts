@@ -5,21 +5,24 @@ import { Job } from '../types';
 const jobsFilePath = path.join(__dirname, '../../', 'public', 'jobs.json');
 
 export const readJobsFromFile = (): Job[] => {
-  //   console.log(jobsFilePath);
   if (!fs.existsSync(jobsFilePath)) {
-    return [];
+    throw new Error('Failed to read!'); // we can add logger here
   }
 
   try {
     const data = fs.readFileSync(jobsFilePath, 'utf-8');
     return JSON.parse(data);
   } catch (error: any) {
-    throw new Error('Error reading or parsing jobs file:', error);
+    throw new Error('Error while reading the file !', error); // we can add logger here
   }
 };
 
 export const writeJobsToFile = (jobs: Job[]): void => {
-  fs.writeFileSync(jobsFilePath, JSON.stringify(jobs, null, 2));
+  try {
+    fs.writeFileSync(jobsFilePath, JSON.stringify(jobs, null, 2), 'utf-8');
+  } catch (error: any) {
+    throw new Error('Failed to write jobs to file', error);
+  }
 };
 
 export const writeJobsToFileAsync = (jobs: Job[]): void => {

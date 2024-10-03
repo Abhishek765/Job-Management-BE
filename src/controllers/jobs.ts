@@ -10,45 +10,70 @@ import {
 import { Job } from '../types';
 import { fetchRandomPhotos } from '../service/unsplash';
 
-export const self = (req: Request, res: Response, next: NextFunction) => {
+export const createJob = (req: Request, res: Response, next: NextFunction) => {
   try {
-    httpResponse(req, res, 200, responseMessages.SUCCESS, { id: 'id' });
-  } catch (err) {
-    httpError(next, err, req, 500);
+    const jobs = readJobsFromFile();
+    const jobId = `${jobs.length + 1}-${Date.now()}`;
+    const newJob: Job = {
+      id: jobId,
+      status: 'pending'
+    };
+
+    jobs.push(newJob);
+    writeJobsToFile(jobs);
+
+    // for delayed execution (5 sec to 5 min)
+    const delay = Math.floor(Math.random() * (300000 - 5000) + 5000);
+    // TODO: For scalability, and reliability  + High load concurrency handling we need to use message queue system like BullMQ + Redis combo
+    const timeoutId = setTimeout(async () => {
+      try {
+        const imageUrls = await fetchRandomPhotos({ count: 5, query: 'food' });
+        // Update the job once it's resolved
+        updateJobInFile(jobId, {
+          status: 'resolved',
+          result: imageUrls
+        });
+      } catch (error) {
+        updateJobInFile(jobId, {
+          status: 'failed',
+          result: []
+        });
+        httpError(next, error, req, 500);
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }, delay);
+    httpResponse(req, res, 200, responseMessages.SUCCESS, {
+      jobId
+    });
+  } catch (error) {
+    httpError(next, error, req, 500);
   }
 };
 
-export const createJob = (req: Request, res: Response, next: NextFunction) => {
-  const jobs = readJobsFromFile();
-  const jobId = `${jobs.length + 1}-${Date.now()}`;
-  const newJob: Job = {
-    id: jobId,
-    status: 'pending'
-  };
+export const getJobs = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const jobs = readJobsFromFile();
+    httpResponse(req, res, 200, responseMessages.SUCCESS, {
+      jobs
+    });
+  } catch (error) {
+    httpError(next, error, req, 404);
+  }
+};
 
-  jobs.push(newJob);
-  writeJobsToFile(jobs);
+export const getJobById = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const jobs = readJobsFromFile();
+    const job = jobs.find((job) => job.id === id);
 
-  // for delayed execution (5 sec to 5 min)
-  const delay = Math.floor(Math.random() * (300000 - 5000) + 5000);
-  // TODO: For scalability, and reliability  + High load concurrency handling we need to use message queue system like BullMQ + Redis combo
-  setTimeout(async () => {
-    try {
-      const imageUrls = await fetchRandomPhotos({ count: 5, query: 'food' });
-      // Update the job once it's resolved
-      updateJobInFile(jobId, {
-        status: 'resolved',
-        result: imageUrls
-      });
-    } catch (error) {
-      updateJobInFile(jobId, {
-        status: 'failed',
-        result: []
-      });
-      httpError(next, error, req, 500);
+    if (!job) {
+      return httpError(next, { message: 'Job not found' }, req, 404);
     }
-  }, delay);
-  httpResponse(req, res, 200, responseMessages.SUCCESS, {
-    jobId
-  });
+
+    httpResponse(req, res, 200, responseMessages.SUCCESS, job);
+  } catch (error) {
+    httpError(next, error, req, 500);
+  }
 };
