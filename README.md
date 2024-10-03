@@ -1,6 +1,7 @@
-## Node Js Backend template For *Scalable Job Management
-  - This is a Backend part of full-stack Job-Queue management app
-  - To check the Frontend code please refer: https://github.com/Abhishek765/job-mangement-fe
+## Node Js Backend template For \*Scalable Job Management
+
+- This is a Backend part of full-stack Job-Queue management app
+- To check the Frontend code please refer: https://github.com/Abhishek765/job-mangement-fe
 
 ### Time Frame
 
@@ -12,8 +13,13 @@
 
 - Reading all jobs + reading jobs by ID API routes + Fixing all error handling cases `~2 hrs`
 
-- **Handling high load concurrency issues: (TBD)**
+## - **Handling high load concurrency issues: (TBD)**
+  - Potential issues need to tackle at scale
+    - Memory and resource limits: Lots of pending requests can block the server if it reaches the limit
+    - Loss of pending jobs on server restart
   - Hint: BullMQ
+    - This will help to persist jobs in a redis-backed queue and process them asynchronously, even across server restarts
+
 ---
 
 ## Setup Process:
