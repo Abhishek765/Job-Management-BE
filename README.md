@@ -1,4 +1,6 @@
 ## Node Js Backend template For *Scalable Job Management
+  - This is a Backend part of full-stack Job-Queue management app
+  - To check the Frontend code please refer: https://github.com/Abhishek765/job-mangement-fe
 
 ### Time Frame
 
