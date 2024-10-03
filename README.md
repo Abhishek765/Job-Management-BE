@@ -8,7 +8,7 @@
   - Handling Post creation logic (To give user a better non-blocking experience)
   - Unsplash Integration + fetching relevant information, utilities creation
 
-- Reading all jobs + byID API routes (TBD)
+- Reading all jobs + reading jobs by ID API routes + Fixing all error handling cases ~2 hrs
 
 - Handling high load concurrency issues (TBD)
   - Hint: BullMQ
