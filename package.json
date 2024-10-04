@@ -5,6 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src/server.ts",
+    "start:worker": "cross-env NODE_ENV=development nodemon src/utils/worker.ts",
     "build": "tsc -p .",
     "start": "cross-env NODE_ENV=production node dist/server.js",
     "lint": "eslint . -c ts -c tsx -c js --quiet",
@@ -18,10 +19,12 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.7",
+    "bullmq": "^5.15.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv-flow": "^4.1.0",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1"
   },
   "lint-staged": {
     "*.ts": [
